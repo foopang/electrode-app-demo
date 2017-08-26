@@ -1,50 +1,73 @@
-/*
- * This is a demo component the Eletrode app generator included
- * to show using Skeleton CSS lib (named base.css) and Redux
- * store for display HTML elements and managing states.
- *
- * To start your own app, please replace or remove these files:
- *
- * - this file (home.jsx)
- * - demo-buttons.jsx
- * - demo-pure-states.jsx
- * - demo-states.jsx
- * - reducers/index.jsx
- * - styles/*.css
- *
- */
+import React, {PropTypes} from "react";
+import {connect} from "react-redux";
+import {toggleCheck, incNumber, decNumber} from "../actions";
+import "../styles/home.css";
 
-import React from 'react';
-import '../styles/normalize.css';
-import '../styles/raleway.css';
-import skeleton from '../styles/skeleton.css';
-import custom from '../styles/custom.css';
-import electrodePng from '../images/electrode.png';
-import DemoStates from './demo-states';
-import DemoPureStates from './demo-pure-states';
-import { DemoButtons } from './demo-buttons';
-/**/
+export const imageUrls = [
+  'http://daynin.github.io/clojurescript-presentation/img/react-logo.png',
+  'https://raw.githubusercontent.com/reactjs/redux/master/logo/logo.png',
+  'http://freevector.co/wp-content/uploads/2014/04/webpack.png',
+  'https://raw.github.com/hapijs/hapi/master/images/hapi.png',
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Emoji_u26a1.svg/2000px-Emoji_u26a1.svg.png'
+];
 
-export default () =>
-  <div className={custom.container}>
-    {/**/}
+class Home extends React.Component {
+  renderImage(imageUrl, key) {
+    return (
+        <img key={key} src={imageUrl} width="10%" height="10%"/>
+    );
+  }
 
-    <section className={custom.header}>
-      <h2 className={skeleton.title}>
-        Hello from {' '}
-        <a href="https://github.com/electrode-io">{'Electrode'} <img src={electrodePng} /></a>
-      </h2>
-    </section>
+  render() {
+    const props = this.props;
+    const {checked, value} = props;
+    return (
+      <div>
+        <h1>Hello <a href={"https://github.com/electrode-io"}>{"Electrode"}</a></h1>
+        <div> <p>Our beloved friends</p></div>
+        <div className="images">
+          {imageUrls.map((imageUrl, index) => this.renderImage(imageUrl, index))}
+        </div>
+        <div>
+          <h2>Managing States with Redux</h2>
+          <label>
+            <input onChange={props.onChangeCheck} type={"checkbox"} checked={checked}/>
+            Checkbox
+          </label>
+          <div>
+            <button type={"button"} onClick={props.onDecrease}>-</button>
+            &nbsp;{value}&nbsp;
+            <button type={"button"} onClick={props.onIncrease}>+</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
 
-    <div className={custom['docs-section']}>
-      <DemoStates />
-    </div>
+Home.propTypes = {
+  checked: PropTypes.bool,
+  value: PropTypes.number.isRequired
+};
 
-    <div className={custom['docs-section']}>
-      <DemoPureStates />
-    </div>
+const mapStateToProps = (state) => {
+  return {
+    checked: state.checkBox.checked, value: state.number.value
+  };
+};
 
-    <div className={custom['docs-section']}>
-      <DemoButtons />
-    </div>
-  </div>;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onChangeCheck: () => {
+      dispatch(toggleCheck());
+    },
+    onIncrease: () => {
+      dispatch(incNumber());
+    },
+    onDecrease: () => {
+      dispatch(decNumber());
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
